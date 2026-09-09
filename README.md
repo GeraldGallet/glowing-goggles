@@ -1,8 +1,9 @@
 # glowing-googles
 
 ## To-do list
-- [ ] Clone the repository
-- [ ] Push it
+- [x] Clone the repository
+- [x] Push it
+- [ ] Get reviewed
 
 ## Conclusion
 Goodbye
