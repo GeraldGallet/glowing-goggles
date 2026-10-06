@@ -1,7 +1,4 @@
-export type AuthorModel = {
-  firstName: string;
-  lastName: string;
-};
+import { AuthorModel } from '../authors/author.model';
 
 export type BookModel = {
   id: string;
@@ -13,7 +10,7 @@ export type BookModel = {
 export type CreateBookModel = {
   title: string;
   publishedYear: number;
-  author: AuthorModel;
+  authorId: string;
 };
 
 export type UpdateBookModel = Partial<CreateBookModel>;

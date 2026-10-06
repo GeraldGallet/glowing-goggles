@@ -1,37 +1,59 @@
 import { Injectable } from '@nestjs/common';
-import { v4 } from 'uuid';
 import { BookModel, CreateBookModel, UpdateBookModel } from './book.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BookEntity } from '../database/entities/book.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class BookRepository {
+  constructor(
+    @InjectRepository(BookEntity)
+    private readonly bookRepository: Repository<BookEntity>,
+  ) {}
+
   private books: BookModel[] = [];
 
-  getBooks(): BookModel[] {
-    return this.books;
-  }
+  async getBooks(
+    offset?: number,
+    limit?: number,
+    sort?: string,
+  ): Promise<[BookModel[], number]> {
+    const [sortingField, sortingDirection] = sort?.split(',') ?? [
+      'title',
+      'asc',
+    ];
 
-  getBookById(bookId: string): BookModel | undefined {
-    return this.books.find(({ id }) => id === bookId);
-  }
-
-  createBook(input: CreateBookModel) {
-    this.books.push({ ...input, id: v4() });
-  }
-
-  updateBook(id: string, input: UpdateBookModel) {
-    this.books = this.books.map((book) => {
-      if (book.id === id) {
-        return {
-          ...book,
-          ...input,
-        };
-      } else {
-        return book;
-      }
+    return this.bookRepository.findAndCount({
+      skip: offset ?? 0,
+      take: limit ?? 10,
+      order: { [sortingField]: sortingDirection },
+      relations: {
+        author: true,
+      },
     });
   }
 
+  async getBookById(bookId: string): Promise<BookModel | null> {
+    return this.bookRepository.findOne({
+      where: { id: bookId },
+      relations: {
+        author: true,
+      },
+    });
+  }
+
+  async createBook(input: CreateBookModel) {
+    const bookEntity = this.bookRepository.create(input);
+
+    return this.bookRepository.save(bookEntity);
+  }
+
+  async updateBook(id: string, input: UpdateBookModel) {
+    await this.bookRepository.update(id, input);
+    return this.getBookById(id);
+  }
+
   deleteBook(id: string) {
-    this.books = this.books.filter((book) => book.id !== id);
+    return this.bookRepository.delete({ id });
   }
 }

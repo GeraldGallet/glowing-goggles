@@ -6,8 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { CreateBookDto, UpdateBookDto } from './book.dto';
+import { CreateBookDto, GetBooksQueryDto, UpdateBookDto } from './book.dto';
 import { BookService } from './book.service';
 
 @Controller('books')
@@ -15,8 +16,13 @@ export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   @Get()
-  getBooks() {
-    return this.bookService.getBooks();
+  async getBooks(@Query() query: GetBooksQueryDto) {
+    const [data, totalCount] = await this.bookService.getBooks(
+      query.offset,
+      query.limit,
+      query.sort,
+    );
+    return { data, totalCount };
   }
 
   @Get(':id')

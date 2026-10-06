@@ -1,14 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class AuthorDto {
-  @IsString()
-  firstName: string;
-
-  @IsString()
-  lastName: string;
-}
-
 export class CreateBookDto {
   @IsString()
   title: string;
@@ -18,8 +10,8 @@ export class CreateBookDto {
   @Min(1500)
   publishedYear: number;
 
-  @Type(() => AuthorDto)
-  author: AuthorDto;
+  @IsString()
+  authorId: string;
 }
 
 export class UpdateBookDto {
@@ -33,7 +25,21 @@ export class UpdateBookDto {
   @IsOptional()
   publishedYear?: number;
 
-  @Type(() => AuthorDto)
+  @IsString()
   @IsOptional()
-  author?: AuthorDto;
+  authorId?: string;
+}
+
+export class GetBooksQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  offset?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  limit?: number;
+
+  @IsOptional()
+  @IsString()
+  sort?: string;
 }

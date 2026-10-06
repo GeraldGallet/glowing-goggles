@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { v4 } from 'uuid';
 import { BookModel, CreateBookModel, UpdateBookModel } from './book.model';
 import { BookRepository } from './book.repository';
 
@@ -7,11 +6,15 @@ import { BookRepository } from './book.repository';
 export class BookService {
   constructor(private readonly bookRepository: BookRepository) {}
 
-  getBooks(): BookModel[] {
-    return this.bookRepository.getBooks();
+  async getBooks(
+    offset?: number,
+    limit?: number,
+    sort?: string,
+  ): Promise<[BookModel[], number]> {
+    return this.bookRepository.getBooks(offset, limit, sort);
   }
 
-  getBookById(bookId: string): BookModel | undefined {
+  async getBookById(bookId: string): Promise<BookModel | null> {
     return this.bookRepository.getBookById(bookId);
   }
 
